@@ -10,7 +10,7 @@ import SwiftUI
 
 
 struct ContentView: View {
-    @State private var wakeUp = Date.now
+    @State private var wakeUp = defaultWakeTime
     @State private var sleepAmount = 8.0
     @State private var coffeeAmount = 1
     
@@ -18,24 +18,59 @@ struct ContentView: View {
     @State private var alertMessage = ""
     @State private var showingAlert = false
     
+    static var defaultWakeTime : Date{
+        var components = DateComponents()
+        components.hour = 7
+        components.minute = 0
+        return Calendar.current.date(from: components) ?? Date.now
+    }
+    
+    var coffeeString : String{
+        var str = ""
+        for i in 1...coffeeAmount{
+            if i > 5{
+                return str+"..."
+            }
+            str = str + "☕️"
+        }
+        return str
+    }
+    
     var body: some View {
         NavigationStack{
-            VStack{
-                Text("When do you want to wake up?")
-                    .font(.headline)
-                DatePicker("Please enter time",selection: $wakeUp,displayedComponents: .hourAndMinute)
-                    .labelsHidden()
+            Form{
                 
-                Text("Desired amount of sleep")
-                    .font(.headline)
+                Section{
+                    DatePicker("Please enter time",selection: $wakeUp,displayedComponents: .hourAndMinute)
+                        .labelsHidden()
+                        .padding()
+                }header: {
+                    Text("WakeUp Time ⏰ ?")
+                        .font(.headline)
+                }
                 
-                Stepper("\(sleepAmount.formatted()) hours",value: $sleepAmount,in: 4...12, step: 0.25)
-                    .padding()
+                Section{
+                    
+                    Stepper("\(sleepAmount.formatted()) hours",value: $sleepAmount,in: 4...12, step: 0.25)
+                        .padding()
+                        
+                }header: {
+                    Text("Desired sleep 🛌 ?")
+                        .font(.headline)
+                    
+                }
                 
-                Text("Daily coffee intake")
-                    .font(.headline)
-                
-                Stepper(coffeeAmount == 1 ? "1 cup" : "\(coffeeAmount) cups",value: $coffeeAmount, in: 1...20)
+                Section{
+                    
+                    
+                    Stepper(coffeeAmount == 1 ? "1 \(coffeeString)" : "\(coffeeAmount) \(coffeeString)",value: $coffeeAmount, in: 1...20)
+                        .padding()
+                    
+                }header: {
+                    Text("Daily coffee intake")
+                        .font(.headline)
+                    
+                }
                 
             }
             .navigationTitle("Better Rest")
